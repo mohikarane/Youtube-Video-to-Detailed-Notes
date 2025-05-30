@@ -8,6 +8,21 @@ from reportlab.pdfgen import canvas
 from io import BytesIO
 import textwrap
 
+page_bg_img = """
+<style>
+# [data-testid="stAppViewContainer"]{
+    # background-color: #fefbd8;
+    # background-image: url("./books2_image.jpg");
+    # background-image: url("https://unsplash.com/photos/a-stack-of-books-with-a-ladder-leaning-against-it-wwtLv4Z4BEA.jpg");
+    # background-size: cover;
+# }
+.st-emotion-cache-1yiq2ps {
+        background-image: url("https://plus.unsplash.com/premium_photo-1677187301660-5e557d9c0724?q=80&w=1930&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D.jpg");
+        background-size: cover;
+    }
+</style>
+"""
+
 
 load_dotenv()
 
@@ -91,6 +106,7 @@ def create_pdf(text):
 
 
 #Streamlit app
+st.markdown(page_bg_img, unsafe_allow_html=True)
 st.title("Youtube Transcript to Detailed Notes Converter")
 youtube_link = st.text_input("Enter Youtube video link: ")
 
