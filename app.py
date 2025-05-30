@@ -3,7 +3,11 @@ from dotenv import load_dotenv
 import os
 import google.generativeai as genai
 from youtube_transcript_api import YouTubeTranscriptApi
-from youtube_transcript_api.formatters import TextFormatter
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from io import BytesIO
+import textwrap
+
 
 load_dotenv()
 
@@ -34,6 +38,58 @@ def generate_gemini_content(transcript_text , prompt):
     response = model.generate_content(prompt+transcript_text)
     return response.text
 
+
+# Function to generate a PDF
+def create_pdf(text):
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
+
+    font_size = 11
+    line_height = 14
+    y = height - 40
+    left_margin = 40
+
+    # Nested helper function to wrap and draw lines
+    def draw_wrapped_line(line, x, width_limit):
+        nonlocal y
+        wrapped_lines = textwrap.wrap(line, width=width_limit)
+        for wrapped_line in wrapped_lines:
+            if y < 40:
+                c.showPage()
+                y = height - 40
+            c.drawString(x, y, wrapped_line)
+            y -= line_height
+
+    for line in text.split('\n'):
+        stripped = line.strip()
+
+        # Handle bold headings
+        if stripped.startswith("**") and stripped.endswith("**"):
+            c.setFont("Helvetica-Bold", 13)
+            clean_line = stripped.strip("*")
+            y -= 10  # Extra spacing for heading
+            draw_wrapped_line(clean_line, left_margin, 90)
+            c.setFont("Helvetica", font_size)
+
+        # Bullets and indentation
+        elif stripped.startswith("* "):
+            draw_wrapped_line(f"• {stripped[2:]}", left_margin + 10, 90)
+        elif stripped.startswith("*"):
+            draw_wrapped_line(f"  ◦ {stripped[1:].strip()}", left_margin + 25, 90)
+
+        # Numbered list
+        elif any(stripped.startswith(f"{n}.") for n in range(1, 10)):
+            draw_wrapped_line(stripped, left_margin, 90)
+
+        else:
+            draw_wrapped_line(stripped, left_margin, 90)
+
+    c.save()
+    buffer.seek(0)
+    return buffer
+
+
 #Streamlit app
 st.title("Youtube Transcript to Detailed Notes Converter")
 youtube_link = st.text_input("Enter Youtube video link: ")
@@ -47,5 +103,21 @@ if st.button("Get Detailed Notes"):
 
     if transcript_text:
         summary = generate_gemini_content(transcript_text, prompt)
-        st.markdown("## Detailed Notes")
-        st.write(summary)
+
+        # Store summary in session_state to persist across reruns
+        st.session_state["summary"] = summary
+        st.session_state["pdf"] = create_pdf(summary)
+
+# Display summary and download if already generated
+if "summary" in st.session_state:
+    st.markdown("## Detailed Notes")
+    st.write(st.session_state["summary"])
+
+    st.download_button(
+        label="Download PDF",
+        data=st.session_state["pdf"],
+        file_name="youtube_summary_notes.pdf",
+        mime="application/pdf"
+    )
+
+
