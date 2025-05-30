@@ -10,16 +10,12 @@ import textwrap
 
 page_bg_img = """
 <style>
-# [data-testid="stAppViewContainer"]{
-    # background-color: #fefbd8;
-    # background-image: url("./books2_image.jpg");
-    # background-image: url("https://unsplash.com/photos/a-stack-of-books-with-a-ladder-leaning-against-it-wwtLv4Z4BEA.jpg");
-    # background-size: cover;
-# }
-.st-emotion-cache-1yiq2ps {
-        background-image: url("https://plus.unsplash.com/premium_photo-1677187301660-5e557d9c0724?q=80&w=1930&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D.jpg");
-        background-size: cover;
-    }
+    .st-emotion-cache-1yiq2ps {
+            # background-image: url("https://plus.unsplash.com/premium_photo-1677187301660-5e557d9c0724?q=80&w=1930&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D.jpg");
+            background-image: url("https://images.pexels.com/photos/46274/pexels-photo-46274.jpeg?cs=srgb&dl=pexels-caio-46274.jpg&fm=jpg");
+            background-size: cover;
+        }
+    
 </style>
 """
 
